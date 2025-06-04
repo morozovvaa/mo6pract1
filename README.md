@@ -1,5 +1,10 @@
 # mo6pract1
  python app.py
+ models
+ scaler.pkl
+
+https://drive.google.com/file/d/1UK4FKJYK4E5_dng6IUmrE0XHFlgtBtd7/view?usp=drive_link
+ссылка на final_wine_model.pkl
 
 GitBash
 curl -X POST -H "Content-Type: application/json" \
@@ -16,10 +21,9 @@ http://127.0.0.1:5000/predict
 Качество	Вероятность
 3	0.0018
 4	0.1447
-5	0.7587 ← 🔮 максимальная
+5	0.7587 ← максимальная
 6	0.0900
 7	0.0048
 8	0.0
 9	0.0
 
-https://drive.google.com/file/d/1UK4FKJYK4E5_dng6IUmrE0XHFlgtBtd7/view?usp=drive_link
