@@ -1,4 +1,14 @@
 # mo6pract1
+
+
+
+
+
+
+
+
+
+
  python app.py
  models
  scaler.pkl
@@ -27,3 +37,4 @@ http://127.0.0.1:5000/predict
 8	0.0
 9	0.0
 
+![image](https://github.com/user-attachments/assets/a4f1db31-f6fd-4432-9c15-175f1a89f296)
