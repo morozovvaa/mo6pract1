@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .feature-input {
+            margin-bottom: 15px;
+        }
+        .prediction-result {
+            margin-top: 20px;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Wine Quality Prediction</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Предсказание качества вина</h3>
+                        <p class="mb-0">Введите химические характеристики вина:</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="prediction-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="feature-input">
+                                        <label for="wine_type" class="form-label">Тип вина</label>
+                                        <select class="form-control" id="wine_type" required>
+                                            <option value="0" selected>Белое</option>
+                                            <option value="1">Красное</option>
+                                        </select>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="fixed_acidity" class="form-label">Фиксированная кислотность</label>
+                                        <input type="number" class="form-control" id="fixed_acidity" step="0.1" value="7.0" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="volatile_acidity" class="form-label">Летучая кислотность</label>
+                                        <input type="number" class="form-control" id="volatile_acidity" step="0.01" value="0.3" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="citric_acid" class="form-label">Лимонная кислота</label>
+                                        <input type="number" class="form-control" id="citric_acid" step="0.01" value="0.3" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="residual_sugar" class="form-label">Остаточный сахар</label>
+                                        <input type="number" class="form-control" id="residual_sugar" step="0.1" value="2.0" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="chlorides" class="form-label">Хлориды</label>
+                                        <input type="number" class="form-control" id="chlorides" step="0.001" value="0.08" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="feature-input">
+                                        <label for="free_sulfur_dioxide" class="form-label">Свободный SO₂</label>
+                                        <input type="number" class="form-control" id="free_sulfur_dioxide" step="1" value="15" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="total_sulfur_dioxide" class="form-label">Общий SO₂</label>
+                                        <input type="number" class="form-control" id="total_sulfur_dioxide" step="1" value="45" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="density" class="form-label">Плотность</label>
+                                        <input type="number" class="form-control" id="density" step="0.0001" value="0.996" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="pH" class="form-label">pH</label>
+                                        <input type="number" class="form-control" id="pH" step="0.01" value="3.3" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="sulphates" class="form-label">Сульфаты</label>
+                                        <input type="number" class="form-control" id="sulphates" step="0.01" value="0.6" required>
+                                    </div>
+                                    <div class="feature-input">
+                                        <label for="alcohol" class="form-label">Алкоголь (%)</label>
+                                        <input type="number" class="form-control" id="alcohol" step="0.1" value="10.0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <span class="spinner-border spinner-border-sm d-none" id="loading-spinner"></span>
+                                    Предсказать качество
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Результат</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="result-container" class="text-center text-muted">
+                            Заполните форму и нажмите "Предсказать качество"
+                        </div>
+                        <canvas id="probability-chart" class="mt-3" style="display: none;" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let probabilityChart = null;
+
+        document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const spinner = document.getElementById('loading-spinner');
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const resultContainer = document.getElementById('result-container');
+            spinner.classList.remove('d-none');
+            submitButton.disabled = true;
+
+            try {
+                const formData = {
+                    fixed_acidity: parseFloat(document.getElementById('fixed_acidity').value),
+                    volatile_acidity: parseFloat(document.getElementById('volatile_acidity').value),
+                    citric_acid: parseFloat(document.getElementById('citric_acid').value),
+                    residual_sugar: parseFloat(document.getElementById('residual_sugar').value),
+                    chlorides: parseFloat(document.getElementById('chlorides').value),
+                    free_sulfur_dioxide: parseFloat(document.getElementById('free_sulfur_dioxide').value),
+                    total_sulfur_dioxide: parseFloat(document.getElementById('total_sulfur_dioxide').value),
+                    density: parseFloat(document.getElementById('density').value),
+                    pH: parseFloat(document.getElementById('pH').value),
+                    sulphates: parseFloat(document.getElementById('sulphates').value),
+                    alcohol: parseFloat(document.getElementById('alcohol').value),
+                    wine_type: parseInt(document.getElementById('wine_type').value)
+                };
+
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const quality = result.prediction;
+                    const confidence = (result.confidence * 100).toFixed(1);
+                    const description = getQualityText(quality);
+
+                    resultContainer.innerHTML = `
+                        <div class="alert alert-success">
+                            <h4>Качество: ${quality}</h4>
+                            <p>${description}</p>
+                            <small>Уверенность: ${confidence}%</small>
+                        </div>
+                    `;
+
+                    displayProbabilityChart(result.probabilities);
+                } else {
+                    resultContainer.innerHTML = `<div class="alert alert-danger">${result.error || 'Ошибка'}</div>`;
+                }
+            } catch (err) {
+                resultContainer.innerHTML = `<div class="alert alert-danger">Ошибка: ${err.message}</div>`;
+            } finally {
+                spinner.classList.add('d-none');
+                submitButton.disabled = false;
+            }
+        });
+
+        function getQualityText(q) {
+            const map = {
+                3: 'Очень низкое качество',
+                4: 'Низкое качество',
+                5: 'Среднее качество',
+                6: 'Хорошее качество',
+                7: 'Очень хорошее качество',
+                8: 'Отличное качество',
+                9: 'Превосходное качество'
+            };
+            return map[q] || 'Неизвестное качество';
+        }
+
+        function displayProbabilityChart(probs) {
+            const canvas = document.getElementById('probability-chart');
+            const ctx = canvas.getContext('2d');
+            const labels = Object.keys(probs).sort();
+            const data = labels.map(label => probs[label] * 100);
+
+            if (probabilityChart) probabilityChart.destroy();
+
+            probabilityChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Вероятность (%)',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Вероятности по классам качества'
+                        }
+                    }
+                }
+            });
+
+            canvas.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
