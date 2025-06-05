@@ -1,8 +1,8 @@
 # Практическая работа 1: Машинное обучение для предсказания качества вина
 Ссылки на ресурсы
 Jupyter Notebook 
-Kaggle
-Google Colab
+Kaggle https://www.kaggle.com/datasets/yasserh/wine-quality-dataset
+Google Colab https://colab.research.google.com/drive/10eN7-q0CUsLe_n6GGkjQjcdujm1vMDSo?usp=sharing
 
 Развернутые сервисы
 JSON API сервис
