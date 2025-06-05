@@ -1,12 +1,8 @@
 # Практическая работа 1: Машинное обучение для предсказания качества вина
 Ссылки на ресурсы
-Jupyter Notebook 
+Jupyter Notebook https://github.com/morozovvaa/mo6pract1/blob/main/%D0%9C%D0%BE%D1%80%D0%BE%D0%B7%D0%BE%D0%B2%D0%B0_%D0%BF%D1%80%D0%B0%D0%BA%D1%82_1.ipynb
 Kaggle https://www.kaggle.com/datasets/yasserh/wine-quality-dataset
 Google Colab https://colab.research.google.com/drive/10eN7-q0CUsLe_n6GGkjQjcdujm1vMDSo?usp=sharing
-
-Развернутые сервисы
-JSON API сервис
-Веб-приложение
 
 Введение
 Целью данного проекта является построение модели классификации, способной предсказывать качество вина на основе его химических характеристик. Используются два датасета:
