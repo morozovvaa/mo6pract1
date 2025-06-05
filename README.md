@@ -410,6 +410,3 @@ python app.py
 
 
 
-
-
-![image](https://github.com/user-attachments/assets/a4f1db31-f6fd-4432-9c15-175f1a89f296)
